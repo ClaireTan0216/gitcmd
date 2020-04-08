@@ -1,0 +1,192 @@
+1. 建立代码仓库
+   git init
+	创建一个空的git仓库或初始化一个已存在的仓库，会建一个.git隐藏目录。
+	在.git目录下，会创建objects, refs/heads, refs/tags和模板文件。
+	$ mkdir facebox.git facebox
+	#建立仓库服务器端
+	$ cd facebox.git
+	$ git init --bare 
+	$ ls
+         branches  config  description  HEAD  hooks  info  objects  refs
+	#建立仓库客户端，建立一个空的git仓库或重新初始化仓库
+       $ cd ../facebox
+	 $ git init  
+	 $ ls -A
+         .git 
+--------------------------------------------------------
+		 
+2. 获取代码库
+   git clone [url]
+      git clone 默认会把远程仓库整个clone下来，但只会在本地创建master分支。
+	如果远程还有其他的分支，此时用git branch -a查看所有分支
+	$ git clone gitosis@sprdroid.git.spreadtrum.com.cn:android/3rdparty.git
+	$ cd 3rdparty
+	$ git branch
+	    *master	#当前分支前面会有 * 号
+	$ git branch –r
+	    origin/HEAD -> origin/master
+	    origin/master
+	    origin/sprdroid_cmcc
+    git 支持http,https,git,ssh协议，我们一般用ssh协议；从android网站下载代码仓库时，可使用git,http协议完成。
+--------------------------------------------------------
+
+3. 添加文件到版本库
+   git add [file]
+	添加目录下修改、删除、新增加的文件到仓库暂存区
+	git add –A 	
+		添加所有文件，包括：untrack,modify,delete
+	git add –u	
+		添加所有track文件，包括：modify,delete
+	git add –f
+		强制添加被忽略的文件。
+	git add .	
+		添加项目中除delete文件外的其他文件
+	git add a.txt c.txt
+		只添加某些文件到index（删除的文件需要用git rm）
+--------------------------------------------------------
+
+4. 忽略某些文件
+	无需纳入git管理，也不希望出现在untrack文件列表的文件，只对未加入版本控制的文件有效。（共享和独享？？）
+	在.gitignore文件中列出这些需要忽略的文件模式。
+    格式规范：
+	所有空行或者以注释符号#开头的行会被git忽略；
+	可以使用标准的模式匹配；
+	匹配模式最后跟反斜杠（/）说明忽略的是目录；
+	要忽略指定模式以外的文件或目录，可以在模式前加上惊叹号取反。
+    $ cat .gitignore
+  # frameworks/base   # 此为注释，被git忽略
+  *.a		   # 忽略所有.a结尾的文件
+  !lib.a		   # 但lib.a除外,!
+  build/		   # 忽略build目录下的所有文件
+  doc/*.txt		   # 忽略doc目录下的所有.txt结尾文件，但不包含doc/notes/*.txt
+  /TODO		  # 仅忽略项目根目录下的TODO文件，但不包含subdir/TODO
+--------------------------------------------------------
+
+5. 删除文件
+   git rm [file]
+	删除受版本控制的文件或文件夹
+	git rm [file]		# 删除文件
+	git rm –rf [folder]	# 删除文件夹
+--------------------------------------------------------
+
+6. 移动文件
+   git mv [sourcefile] [destinationfile]
+	移动源文件为目标文件，相当于重命名。
+	git mv readme.txt README
+   相当于：
+	mv readme.txt README
+	git rm readme.txt
+	git add README
+--------------------------------------------------------
+
+7. 代码提交
+   每次提交后，git内部都会生成一个快照，保存所有修改过的文件，并生成一个标识用以标识本次提交，每次提交都有且仅有一个父提交
+   git commit [option] 
+	将存储在当前索引的内容全部提交。
+    1、git commit 
+	git commit 不加-m参数会启动编辑器以便输入本次提交的说明
+ 
+    2、git commit [file] –m “message”
+	不打开文本编辑器，直接在命令行写注释，然后提交。
+	提交后会显示本次提交的完整 SHA-1 校验和， 以及在本次提交中，有多少文件修改过，多少行添改和删改过。
+	summerduan@wiki-server:~/test$ git commit a.txt -m "fix the bug2011"
+	 [master 0f474c1] fix the bug2011
+	 1 files changed, 1 insertions(+), 0 deletions(-)
+ 
+    3、git commit –a [file]
+	自动把所有已跟踪过的文件暂存起来一并提交，从而跳过 git add 步骤。
+--------------------------------------------------------
+
+8. 查看仓库状态
+   git status
+	查看仓库当前工作于哪个分支；
+	查看文件状态：被修改，被删除，新增加等
+	每次提交前，都用git status查看下是不是都已暂存起来了，然后再提交。
+   $ git status
+   # On branch master
+   # Changed but not updated:
+   #   (use "git add <file>..." to update what will be committed)
+   #   (use "git checkout -- <file>..." to discard changes in working directory)
+   #
+   #       modified:   a.txt
+   #
+   no changes added to commit (use "git add" and/or "git commit -a")
+   git合并时发生冲突没有提交。可以用git status查看是哪些文件发生冲突。
+   这个命令在不同状态下都会有一些操作提示，按照提示操作即可
+--------------------------------------------------------
+
+9. 查看提交历史
+   git log
+	查看全部提交日志
+   git log -5
+	查看最近5次的提交日志
+   git log –p
+	查看所有提交日志及修改的内容
+   git log –p --author=“scott”
+	查看所有scott提交日志及修改内容
+   git log --since=“2011-05-24”
+	查看2011-05-24以后所有的提交日志
+   git log --graph
+	查看提交日志，以图形方式显示
+   git log --since=“2 days ago”
+	查看这两天的提交日志
+   git log --until=“2011-05-25”
+	查看截止2011-05-25所有的提交日志
+   git log --name-only
+	查看所有修改过的文件
+   git log --pretty=oneline
+	查看提交日志，一行显示
+   git log --pretty=format:%h:%s
+	查看提交日志，显示sha1及提交comments
+--------------------------------------------------------
+
+10. 查看差异
+   git diff
+	比较当前工作空间与staging area,查看工作空间的变化
+   git diff --cached
+	比较staging area与本地仓库,查看暂存区中变化
+   git diff HEAD
+	比较当前工作空间与本地仓库
+   git diff newbranch
+	比较当前工作空间与newbranch分支
+   git diff tag1 tag2
+	比较tag1与tag2
+   git diff tag1:file1 tag2:file2
+	比较tag1的file1与tag2的file2
+   git diff tag1 tag2 file
+	比较tag1与tag2的file文件
+   git diff --stat	
+ 	统计有差异的文件个数
+--------------------------------------------------------
+
+11. 还原文件
+   git revert和git reset的区别：
+   git revert 是撤销某次操作，此次操作之前的commit都会被保留
+   git reset 是撤销某次提交，但是此次之后的修改都会被退回到暂存区
+   git reset --hard
+      取消commit，取消add，取消源文件修改
+   git reset --soft
+      取消commit
+   git reset --mixed
+      取消commit，取消add，是默认模式
+
+   git reset --hard HEAD   （比较下）
+	   恢复到HEAD状态
+   git reset --hard HEAD^
+	   彻底撤销最近一次提交
+   git reset --hard HEAD~3
+	   彻底撤销最近3次提交
+   git reset  --soft HEAD~3
+	   撤销最近3次commit,恢复到index状态，并且工作空间文件内容不变
+   git reset HEAD filename
+	   删除暂存的文件
+
+   git revert
+      撤销某次提交，此次操作之前的commit都会被保留，但撤销也会作为一次提交进行保存。
+   git commit --amend 
+   修改最后一次提交。
+   如果上次提交时遗漏了文件，可以在提交后将文件加入缓存然后用该命令提交即可。
+   如果缓存中内容没有任何修改，只更新修改的提交注释。
+--------------------------------------------------------
+
+12.
