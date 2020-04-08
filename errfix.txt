@@ -1,0 +1,7 @@
+1. fatal: unable to auto-detect email address 
+  git config --global user.email "killua_jie@126.com"
+  git config --global user.name "clairetan"
+
+--------------------------------------------------------
+
+2. 
